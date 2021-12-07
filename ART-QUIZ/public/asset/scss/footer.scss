@@ -1,0 +1,46 @@
+a {
+  color: black;
+}
+
+.footer {
+  width: 100%;
+  max-width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  animation: load-content 1s ease-in-out;
+  opacity: 0;
+  animation-fill-mode: forwards;
+
+  &-content {
+    max-width: 50%;
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+
+    @media (max-width: 768px) {
+      max-width: 100%;
+    }
+  }
+
+  @keyframes load-content {
+    to {
+      opacity: 1;
+    }
+  }
+
+  &-logo {
+    background-image: url("../icons/rs_school_js.svg");
+    background-repeat: no-repeat;
+    width: 96px;
+    height: 48px;
+  }
+}
+
+.footer.hidden {
+  display: none;
+}

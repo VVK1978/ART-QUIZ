@@ -1,0 +1,34 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"airbnb-base",
+		"eslint:recommended"
+	],
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"impliedStrict": true
+		}
+	},
+	"plugins": [
+		"@babel",
+		"@babel/development"
+	],
+	"rules": {
+		"@babel/new-cap": "error",
+		"@babel/no-invalid-this": "error",
+		"@babel/no-unused-expressions": "error",
+		"@babel/object-curly-spacing": "warn",
+		"@babel/semi": "error",
+		"max-len": [
+			"warn",
+			{
+				"code": 140
+			}
+		]
+	}
+}

@@ -1,0 +1,138 @@
+.category {
+  &-pictures,
+  &-artists {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: calc(65vh - 20px);
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    @media (min-width: 1440px) {
+      max-width: 1000px;
+    }
+  }
+
+  &-pictures.open,
+  &-artists.open {
+    animation: page-open 1s ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes page-open {
+    to {
+      opacity: 1;
+    }
+  }
+
+  &-content {
+    // margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+    @media (min-width: 1440px) {
+      min-height: calc(65vh - 20px);
+    }
+  }
+
+  &-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    max-width: 100%;
+
+    @media (max-width: 768px) {
+      width: 85%;
+    }
+  }
+
+  &-title {
+    text-align: center;
+    font-size: 3rem;
+    color: rgb(106, 175, 255);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+      width: 90%;
+      min-width: 80%;
+    }
+  }
+
+  &-container {
+    margin-top: 10px;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  &-card {
+    position: relative;
+    max-width: 320px;
+    width: 100%;
+    height: 100px;
+    margin: 5px auto;
+    padding-left: 5px;
+    border: cornflowerblue solid 1px;
+    border-radius: 0 10px 0 10px;
+    font-size: 32px;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    color: white;
+    cursor: pointer;
+    transition: 0.6s ease-in-out;
+    background-color: cornflowerblue;
+    overflow: hidden;
+  }
+
+  &-card.answered {
+    background-color: white;
+    color: cornflowerblue;
+  }
+
+  &-card:hover {
+    color: orangered;
+    border-color: cornflowerblue;
+  }
+
+  &-image {
+    width: 80%;
+    height: 200%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 35% 10px 0 82%;
+  }
+
+  &-answers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    padding: 5px;
+    right: 5px;
+    color: #fff;
+    top: 5px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: cornflowerblue;
+    font-size: 20px;
+    transition: transform 0.5s ease-in;
+  }
+
+  &-answers:hover {
+    transform: scale(1.1);
+    background-color: orange;
+  }
+}
