@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable @babel/object-curly-spacing */
 import { getResult } from './store';
 

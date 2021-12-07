@@ -9,3 +9,5 @@ export const CATEGORIES_QUANTITY = 12;
 export const IMAGES_PER_CATEGORY = 10;
 export const ANSWERS = 4;
 export const RESULTS = 10;
+export const ARTISTS_FIRST_IMAGE = 0;
+export const PICTURES_FIRST_IMAGE = 120;

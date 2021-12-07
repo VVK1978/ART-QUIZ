@@ -49,7 +49,7 @@
     max-width: 100%;
     width: 100%;
     border-radius: 1rem;
-    border: 5px solid rgb(106, 175, 255);
+    border: 2px solid rgb(106, 175, 255);
     transition: 0.8s ease-in-out;
     animation: anime 0.5s ease-in-out;
   }
@@ -80,6 +80,7 @@
 
   &-text {
     font-size: 2rem;
+    text-align: center;
 
     @media (max-width: 480px) {
       font-size: 1.5rem;
@@ -92,13 +93,43 @@
 }
 
 .images-container {
+  position: relative;
   max-width: 100%;
-  width: 65%;
+  width: 90%;
+  min-height: 60vh;
   transition: 1s ease-in-out;
   opacity: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1919px) {
+    width: 84%;
+  }
+
+  @media (max-width: 1439px) and (max-device-aspect-ratio: 4/3) {
+    width: 70%;
+    min-height: 64vh;
+  }
+
+  @media (max-width: 1439px) and (min-device-aspect-ratio: 4/3) {
+    width: 70%;
+    min-height: 64vh;
+  }
+
+  @media (max-width: 767px) {
+    width: 85%;
+    min-height: 50vh;
+  }
+
+  @media (max-width: 480px) {
+    min-height: 48vh;
+  }
+
+  @media (max-width: 480px) and (min-height: 737px) {
+    min-height: 40vh;
+  }
+
+  @media (max-width: 1024px) and (min-height: 1366px) {
     width: 100%;
+    min-height: 52vh;
   }
 }
 
@@ -143,12 +174,16 @@
   &-buttons-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 1vh;
     max-width: 100%;
     width: 100%;
-    height: auto;
+    min-height: 12vh;
+
+    @media (max-width: 767px) {
+      min-height: 30vh;
+      justify-content: center;
+    }
   }
 }
 
@@ -184,19 +219,19 @@
 
 .button-answer {
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 900;
   font-family: "Pacifico";
   width: 100%;
   max-width: 49%;
-  height: 50px;
-  padding: 1vh;
+  height: 40px;
+  padding: 2px;
   border: 2px solid rgb(106, 175, 255);
   border-radius: 5px;
   opacity: 1;
   animation: anime 1s ease-in-out;
 
-  @media (max-width: 480px) {
+  @media (max-width: 767px) {
     max-width: 90%;
   }
 }
@@ -217,25 +252,27 @@
 
 .picture-game {
   width: 100%;
+  min-height: 64vh;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
   align-items: center;
 }
 
 .picture-image {
   &-container {
-    width: 100%;
-    max-width: 75%;
-    border: 3px orange solid;
-    border-radius: 15px;
+    width: 50%;
+    max-width: 100vw;
+    border: 2px orange solid;
+    border-radius: 8px;
     overflow: hidden;
   }
 
   &-answer {
     display: block;
     width: 100%;
-    height: 25vh;
+    height: 31vh;
     object-fit: cover;
     object-position: top center;
     cursor: pointer;

@@ -1,83 +1,89 @@
 /* eslint-disable @babel/object-curly-spacing */
 /* eslint-disable import/no-cycle */
-import getImageUrl from '../utils/get-image-url';
 import infoImages from '../constants/images';
-import closeThisPage from '../utils/close-page';
-import Category from './category';
+import categoryOpen from '../utils/category-open';
+import getImageUrl from '../utils/get-image-url';
+import isLoader from '../utils/loader-state';
 import getCategoryResult from '../utils/get-category-result';
 import getCategoryImagePath from '../utils/get-category-url';
+import createImage from '../utils/create-image';
 import {
   RESULTS,
   IMAGES_PER_CATEGORY,
-  TIME_ANIMATION,
   TIMER_MODAL_OPEN,
+  ARTISTS_FIRST_IMAGE,
+  PICTURES_FIRST_IMAGE,
 } from '../constants/game-constants';
 
 export default class Result {
   constructor(answers, state) {
     this.answers = answers;
     this.firstCategoryImagePosition = (state.id - 1) * IMAGES_PER_CATEGORY;
-    if (state.gameTitle === 'Художники') {
-      this.startPosition = 0;
-    } else {
-      this.startPosition = 120;
-    }
     this.state = {
       gameTitle: state.gameTitle,
       game: state.game,
       id: state.id,
-      imagePosition: this.startPosition + this.firstCategoryImagePosition,
+      startImagePosition:
+        state.game === 'artists'
+          ? ARTISTS_FIRST_IMAGE + this.firstCategoryImagePosition
+          : PICTURES_FIRST_IMAGE + this.firstCategoryImagePosition,
     };
   }
 
   run() {
     this.renderContent();
+    isLoader();
   }
 
   renderContent() {
     const urls = [];
     [...Array(RESULTS).keys()].forEach((index) => {
-      urls.push(getImageUrl(this.state, index));
+      const currentImage = this.state.startImagePosition + index;
+      urls.push(getImageUrl(this.state, currentImage));
     });
     Promise
       .all(urls)
-      .then((data) => {
-        this.resultContent = this.getResultContent(data);
-      })
-      .then(() => {
-        this.categoryImagePath = getCategoryImagePath(this.state);
-      })
-      .then(async () => {
-        this.categoryImageContent = await this.getCategoryImageContent(this.state.id);
-      })
-      .then(() => {
-        this.resultPageContent = this.getResultPageContent(this.categoryImageContent, this.resultContent);
-      })
-      .then(() => {
-        const wrapper = document.querySelectorAll('.wrapper');
-        wrapper[0].insertAdjacentHTML('beforeend', this.resultPageContent);
-      })
-      .then(() => {
-        this.result = document.querySelector('.result');
-        setTimeout(() => { this.result.classList.add('open'); }, TIMER_MODAL_OPEN);
-      })
-      .then(() => {
-        this.handleClick();
-        this.contentClick();
+      .then((result) => {
+        const images = [];
+        result.forEach((url) => {
+          images.push(createImage(url));
+        });
+        Promise
+          .all(images)
+          .then((data) => {
+            this.resultContent = this.renderInfoImages(data);
+          })
+          .then(async () => {
+            this.categoryImageContent = await this.renderCategoryImage(this.state.id);
+          })
+          .then(() => {
+            this.resultPageContent = this.renderResultPage(this.categoryImageContent, this.resultContent);
+          })
+          .then(() => {
+            const wrapper = document.querySelectorAll('.wrapper');
+            wrapper[0].insertAdjacentHTML('beforeend', this.resultPageContent);
+          })
+          .then(() => {
+            this.result = document.querySelector('.result');
+            setTimeout(() => { this.result.classList.add('open'); }, TIMER_MODAL_OPEN);
+            this.backClick();
+            this.contentClick();
+            isLoader();
+          });
       });
   }
 
-  getResultContent(data) {
+  renderInfoImages(images) {
     this.resultContent = '';
-    data.forEach((url, index) => {
+    images.forEach((image, index) => {
       const style = this.getResult(this.answers.categoryAnswers[index + 1]);
-      const imageData = infoImages[this.state.imagePosition + index];
+      const imageData = infoImages[this.state.startImagePosition + index];
       const { name } = imageData;
       const { author } = imageData;
       const { year } = imageData;
       this.resultContent += `
         <div class="result-content-image-container" id="result-${index}">
-          <img class="result-content-image ${style}" src="${url}" alt="image" data-image=${index}/>
+          <img class="result-content-image ${style}" src="${image.src}" alt="image" data-image=${index}/>
           <div class="result-content-icon ${style}"></div>
           <div class="image-info">
             <p>
@@ -99,8 +105,8 @@ export default class Result {
     return this.resultContent;
   }
 
-  async getCategoryImageContent() {
-    const answerCorrectCount = getCategoryResult(this.state);
+  async renderCategoryImage() {
+    const categoryResult = getCategoryResult(this.state);
     let result = null;
     if (this.state.id < 10) {
       result = `0${this.state.id}`;
@@ -115,15 +121,15 @@ export default class Result {
           ${result}
         </div>
         <div class="result-category-answered">
-          ${answerCorrectCount}/${RESULTS}
+          ${categoryResult}/${RESULTS}
         </div>
       </div>
           `;
   }
 
-  getResultPageContent(categoryImage, resultContent) {
+  renderResultPage(categoryImage, resultContent) {
     this.html = `
-    <div class="result">
+    <section class="result">
       <div class="result-body">
         <div class="result-head">
           <div class="result-title">
@@ -138,7 +144,7 @@ export default class Result {
         <div class="result-footer">
         </div>
       </div>
-    </div>
+    </section>
     `;
     return this.html;
   }
@@ -169,16 +175,12 @@ export default class Result {
   }
 
   categoryPageOpen() {
-    closeThisPage();
     this.footer = document.querySelector('.footer');
     this.footer.classList.add('hidden');
-    setTimeout(() => {
-      this.category = new Category(this.state);
-      this.category.run();
-    }, TIME_ANIMATION);
+    categoryOpen(this.state);
   }
 
-  handleClick() {
+  backClick() {
     const backToCategory = document.querySelector('.back-from-result');
     backToCategory.addEventListener('click', () => {
       this.categoryPageOpen();

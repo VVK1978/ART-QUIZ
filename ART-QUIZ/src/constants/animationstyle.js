@@ -1,9 +1,9 @@
 export default {
-  Художники: {
+  artists: {
     slideIn: 'slide-in-artists',
     slideOut: 'slide-out-artists',
   },
-  Картины: {
+  pictures: {
     slideIn: 'slide-in-pictures',
     slideOut: 'slide-out-pictures',
   },

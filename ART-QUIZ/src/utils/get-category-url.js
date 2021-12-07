@@ -1,8 +1,6 @@
-export default async function getCategoryImagePath(state) {
-  let url = '';
-  if (state.gameTitle === 'Художники') {
-    url = await import(`../../public/asset/images/bg/artists/${state.id}.webp`).then((data) => data.default);
+export default async function getCategoryImagePath(state, index) {
+  if (state.game === 'artists') {
+    return import(`../../public/asset/images/bg/artists/${index || state.id}.webp`).then((data) => data.default);
   }
-  url = await import(`../../public/asset/images/bg/pictures/${state.id}.webp`).then((data) => data.default);
-  return url;
+  return import(`../../public/asset/images/bg/pictures/${index || state.id}.webp`).then((data) => data.default);
 }

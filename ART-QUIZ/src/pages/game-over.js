@@ -1,27 +1,27 @@
 /* eslint-disable @babel/object-curly-spacing */
 /* eslint-disable import/no-cycle */
 import getCategoryResult from '../utils/get-category-result';
-import Category from './category-old';
 import Result from './result';
+import categoryOpen from '../utils/category-open';
 import closeThisPage from '../utils/close-page';
 import { getResult } from '../utils/store';
 import { TIMER_MODAL_OPEN, TIME_ANIMATION } from '../constants/game-constants';
 
 export default class GameOver {
-  constructor(gameTitle, id) {
+  constructor(state) {
     this.state = {
-      gameTitle,
-      id,
+      gameTitle: state.gameTitle,
+      game: state.game,
+      id: state.id,
       good: 'Вы отлично справились!!!',
       bad: 'Вам надо сосредоточиться...)',
       green: 'green',
-      answers: null,
     };
   }
 
   run() {
-    this.state.answers = getResult(this.state.gameTitle, this.state.id);
-    const result = getCategoryResult(this.state.gameTitle, this.state.id);
+    this.answers = getResult(this.state);
+    const result = getCategoryResult(this.state);
     if (result < 9) {
       this.text = this.state.bad;
       this.style = 'red';
@@ -58,21 +58,10 @@ export default class GameOver {
     return this.html;
   }
 
-  backCategory() {
+  resultPageOpen() {
     closeThisPage();
     setTimeout(() => {
-      if (this.state.gameTitle === 'Художники') {
-        new Category('artists', this.state.gameTitle).run();
-      } else {
-        new Category('pictures', this.state.gameTitle).run();
-      }
-    }, TIME_ANIMATION);
-  }
-
-  toResultPage() {
-    closeThisPage();
-    setTimeout(() => {
-      new Result(this.state.answers, this.state.id, this.state.gameTitle).run();
+      new Result(this.answers, this.state).run();
     }, TIME_ANIMATION);
   }
 
@@ -81,10 +70,10 @@ export default class GameOver {
     footer.addEventListener('click', (event) => {
       const { target } = event;
       if (target.id === 'over-back') {
-        this.backCategory();
+        categoryOpen();
       }
       if (target.id === 'result-page') {
-        this.toResultPage();
+        this.resultPageOpen();
       }
     });
   }

@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @babel/no-unused-expressions */
-/* eslint-disable object-curly-spacing */
+/* eslint-disable @babel/object-curly-spacing */
 /* eslint-disable import/no-cycle */
 //----------------------------------------------
 // id - номер категории
@@ -8,12 +6,13 @@
 import Game from './game';
 import Main from './main';
 import Result from './result';
-import Element from '../components/element';
+import getImageUrl from '../utils/get-category-url';
 import closeThisPage from '../utils/close-page';
-import {getResult} from '../utils/store';
+import { getResult } from '../utils/store';
 import getCategoryResult from '../utils/get-category-result';
 import footerHidden from '../utils/footer-hidden';
-import {RESULTS, CATEGORIES_QUANTITY, TIME_ANIMATION} from '../constants/game-constants';
+import isLoader from '../utils/loader-state';
+import { RESULTS, CATEGORIES_QUANTITY, TIME_ANIMATION } from '../constants/game-constants';
 
 export default class Category {
   constructor(state) {
@@ -21,15 +20,17 @@ export default class Category {
       game: state.game,
       gameTitle: state.gameTitle,
       image: 1,
-      id: null,
+      id: 0,
       result: null,
     };
+    footerHidden();
+    this.wrapper = document.querySelectorAll('.wrapper');
+    this.wrapper[0].insertAdjacentHTML('afterbegin', this.renderPage());
+    isLoader();
   }
 
   run() {
-    footerHidden();
-    this.wrapper = document.querySelectorAll('.wrapper');
-    this.wrapper[0].insertAdjacentHTML('afterbegin', this.renderPage(this.state.game, this.state.gameTitle));
+    this.categoryContainer = document.querySelector('.category-container');
     this.createAllImage();
   }
 
@@ -37,15 +38,16 @@ export default class Category {
     this.createImage();
   }
 
-  renderPage(game, gameTitle) {
+  renderPage() {
     this.section = `
-      <div id="loader" class="loader">Loading...</div>
-      <section id="pictures" class="category-${game}">
+      <section id="${this.state.game}" class="category-${this.state.game}">
       <div class="category-content">
           <div class="category-head">
               <div id="back-to-main" class="back back-main">
               </div>
-              <h2 class="category-title">${gameTitle}</h2>
+              <h2 class="category-title">
+                ${this.state.gameTitle}
+              </h2>
           </div>
           <div class="category-container">
           </div>
@@ -58,7 +60,7 @@ export default class Category {
   renderCards() {
     const imagesPath = [];
     for (let i = 1; i <= CATEGORIES_QUANTITY; i += 1) {
-      imagesPath.push(this.getImageUrl(i));
+      imagesPath.push(getImageUrl(this.state, i));
     }
     this.cards = '';
     Promise
@@ -66,23 +68,24 @@ export default class Category {
       .then(async (data) => {
         this.imagesPath = await data;
         this.imagesPath.forEach((path, index) => {
+          this.state.id = index + 1;
           this.card = this.renderCard(path, index);
           this.cards += this.card;
         });
       })
       .then(() => {
-        const categoryContainer = document.querySelector('.category-container');
-        categoryContainer.insertAdjacentHTML('afterbegin', this.cards);
-      })
-      .then(() => {
-        this.renderAnswersCategory();
+        this.categoryContainer.insertAdjacentHTML('afterbegin', this.cards);
       });
   }
 
   renderCard(path, index) {
     this.src = path;
+    this.correctAnswers = getCategoryResult(this.state);
     this.card = `
-    <div id="category-${this.state.game}-${index + 1}" class="category-card" data-category="${index + 1}">
+    <div 
+    id="category-${this.state.game}-${index + 1}" 
+    class="category-card ${this.correctAnswers > 0 ? 'answered' : ''}" 
+    data-category="${index + 1}">
       ${index < 9 ? `0${index + 1}` : index + 1}
       <img 
         src="${this.src}"
@@ -90,40 +93,24 @@ export default class Category {
         id="category-image-${index + 1}" 
         class="category-image" 
         data-category="${index + 1}"/>
+        ${this.correctAnswers > 0 ? this.renderAnswersCategory(index) : ''}
     </div >
   `;
     return this.card;
   }
 
-  renderAnswersCategory() {
-    [...Array(CATEGORIES_QUANTITY).keys()].forEach((index) => {
-      this.state = {...this.state, id: index + 1};
-      this.correctAnswers = getCategoryResult(this.state);
-      if (this.correctAnswers > 0) {
-        this.answers = new Element('div', '', `category-answers category-${index + 1}`, '').render();
-        const category = document.getElementById(`category-${this.state.game}-${index + 1}`);
-        category.classList.add('answered');
-        category.insertAdjacentElement('beforeend', this.answers);
-        const answers = document.querySelector(`.category-${index + 1}`);
-        answers.textContent = `${this.correctAnswers}/${RESULTS}`;
-        answers.title = 'Результаты категории...';
-        answers.setAttribute('data-result', index + 1);
-      }
-    });
-  }
-
-  getImageUrl(imageNumber) {
-    if (this.state.game === 'artists') {
-      return import(`../../public/asset/images/bg/artists/${imageNumber}.webp`)
-        .then((data) => data.default);
-    }
-    return import(`../../public/asset/images/bg/pictures/${imageNumber}.webp`)
-      .then((data) => data.default);
+  renderAnswersCategory(index) {
+    this.html = `
+        <div class="category-answers category-${index + 1}" data-result="1" title="Результаты категории...">
+          ${this.correctAnswers}/${RESULTS}
+        </div>
+        `;
+    return this.html;
   }
 
   async createImage() {
     const image = new Image();
-    image.src = await this.getImageUrl(this.state.image);
+    image.src = await getImageUrl(this.state, this.state.image);
     image.onload = () => {
       if (this.state.image === CATEGORIES_QUANTITY) {
         this.allImageLoaded();
@@ -135,8 +122,7 @@ export default class Category {
   }
 
   async allImageLoaded() {
-    const loader = document.querySelector('.loader');
-    loader.classList.add('loader-hidden');
+    isLoader();
     this.handleClick();
     await this.renderCards();
     const section = document.querySelector(`.category-${this.state.game}`);
@@ -153,18 +139,18 @@ export default class Category {
 
   handleClick() {
     if (document.querySelector('.category-container')) {
-      this.categoryContainer = document.querySelector('.category-container');
       this.categoryContainer.addEventListener('click', (event) => {
         this.state.id = +event.target.dataset.category;
         this.state.result = +event.target.dataset.result;
         if (this.state.id) {
           closeThisPage();
           setTimeout(() => {
-            new Game(this.state.id, this.state.gameTitle).run();
+            new Game(this.state).run();
             this.handleClick();
           }, TIME_ANIMATION);
         }
         if (this.state.result) {
+          closeThisPage();
           setTimeout(() => {
             this.resultPageOpen();
           }, TIME_ANIMATION);
@@ -180,17 +166,5 @@ export default class Category {
         }, TIME_ANIMATION);
       });
     }
-    if (document.querySelector('.back-category')) {
-      this.backArrow = document.querySelector('.back-category');
-      this.backArrow.addEventListener('click', () => {
-        setTimeout(() => {
-          this.backToCategory();
-        }, TIME_ANIMATION);
-      });
-    }
-  }
-
-  backToCategory() {
-    new Category(this.state).run();
   }
 }

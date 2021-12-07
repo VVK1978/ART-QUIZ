@@ -7,9 +7,9 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 const ASSET = path.resolve(__dirname, './public');
 
-module.exports = ({ development }) => ({
+module.exports = (development) => ({
   mode: development ? 'development' : 'production',
-  devtool: development ? 'source-map' : false,
+  devtool: development ? 'eval' : false,
   entry: {
     main: './src/index.js',
   },
@@ -73,5 +73,7 @@ module.exports = ({ development }) => ({
     historyApiFallback: true,
     port: 4000,
     open: true,
+    compress: true,
+    stats: 'minimal',
   },
 });

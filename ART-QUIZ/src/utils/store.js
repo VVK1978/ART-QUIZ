@@ -24,10 +24,10 @@ function setSettingsData(key, value) {
   localStorage.setItem('settings', JSON.stringify(settings));
 }
 
-function saveGameResults(result, game, id) {
+function saveGameResults(result, state) {
   const resultsAll = JSON.parse(localStorage.getItem('results'));
-  resultsAll[game][id] = result[id];
-  resultsAll[game][id].isEnd = true;
+  resultsAll[state.gameTitle][state.id] = result[state.id];
+  resultsAll[state.gameTitle][state.id].isEnd = true;
   localStorage.setItem('results', JSON.stringify(resultsAll));
 }
 

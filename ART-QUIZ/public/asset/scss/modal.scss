@@ -7,7 +7,7 @@
     transform: translate(-50%, 100%);
     z-index: 1;
     background-color: white;
-    width: 91%;
+    width: 100%;
     max-width: 700px;
     height: 60vh;
     transition: 0.8s ease-in-out;
@@ -28,10 +28,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 20%;
+        height: 8vh;
         width: 100%;
         max-width: 100%;
-        margin-top: 25px;
+        margin-top: 15px;
     }
 
     &-icon-container {
@@ -44,6 +44,11 @@
         justify-content: center;
         align-items: center;
         background-color: white;
+
+        @media (max-width: 767px) {
+            width: 70px;
+            height: 70px;
+        }
     }
 
     &-icon {
@@ -61,6 +66,10 @@
         &-author {
             font-size: 1.5rem;
             font-weight: 900;
+
+            @media (max-width: 320px) {
+                font-size: 1rem;
+            }
         }
     }
 

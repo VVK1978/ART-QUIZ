@@ -3,6 +3,7 @@
 import Element from '../components/element';
 import Category from './category';
 import Settings from './settings';
+import loader from '../components/loader';
 import closeThisPage from '../utils/close-page';
 import MAIN_OUT_TIME, { TIME_ANIMATION } from '../constants/game-constants';
 
@@ -27,8 +28,9 @@ export default class Main {
   run() {
     if (!document.querySelector('.main')) {
       this.body.append(this.mainElement.render());
-      this.main = document.querySelector('.main');
-      this.main.append(this.wrapper.render());
+      const main = document.querySelector('.main');
+      main.append(this.wrapper.render());
+      main.insertAdjacentHTML('afterbegin', loader());
     }
     this.main = document.querySelector('.main');
     this.main.classList.add('open');
